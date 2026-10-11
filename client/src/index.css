@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Light theme. Values are "R G B" so Tailwind can add transparency. */
+  :root {
+    --c-paper: 244 246 250;
+    --c-card: 255 255 255;
+    --c-line: 221 227 238;
+    --c-ink: 14 22 38;
+    --c-muted: 86 100 128;
+    --c-accent: 242 193 78;      /* fill for buttons */
+    --c-on-accent: 26 20 5;      /* text on top of the fill */
+    --c-accent-ink: 138 90 0;    /* accent used as text or links */
+    --c-link: 31 95 209;
+    --c-data: 182 118 0;         /* chart bars */
+    color-scheme: light;
+  }
+
+  /* Dark theme */
+  .dark {
+    --c-paper: 13 20 36;
+    --c-card: 20 28 48;
+    --c-line: 37 48 74;
+    --c-ink: 232 237 246;
+    --c-muted: 147 160 186;
+    --c-accent: 242 193 78;
+    --c-on-accent: 26 20 5;
+    --c-accent-ink: 242 193 78;
+    --c-link: 106 168 255;
+    --c-data: 242 193 78;
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-paper font-sans text-ink antialiased;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+  }
+
+  :focus-visible {
+    outline: 2px solid rgb(var(--c-link));
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: rgb(var(--c-accent) / 0.45);
+  }
+}
+
+@layer components {
+  .cta {
+    @apply inline-flex items-center justify-center rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-on-accent transition hover:brightness-95;
+  }
+  .cta-quiet {
+    @apply inline-flex items-center justify-center rounded-md border border-line px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:border-ink/40;
+  }
+}
+
+/* The one animated moment: chart bars grow in once on load */
+@keyframes bar-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+.bar {
+  transform-origin: left center;
+  animation: bar-grow 800ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: calc(var(--i, 0) * 80ms + 150ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .bar { animation: none; }
+}
