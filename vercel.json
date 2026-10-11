@@ -1,9 +1,17 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "client/dist",
-  "regions": ["fra1"],
+  "services": {
+    "web": {
+      "root": "client/",
+      "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+    },
+    "api": {
+      "root": "server/",
+      "framework": "express",
+      "entrypoint": "src/app.js"
+    }
+  },
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/api/(.*)", "destination": { "service": "api" } },
+    { "source": "/(.*)", "destination": { "service": "web" } }
   ]
 }
