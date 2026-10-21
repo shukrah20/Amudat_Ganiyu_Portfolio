@@ -19,6 +19,7 @@ CREATE TABLE profile (
   full_name    TEXT NOT NULL,
   headline     TEXT,
   bio          TEXT,
+  about_md     TEXT,
   location     TEXT,
   email        TEXT,
   avatar_url   TEXT,
