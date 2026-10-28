@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import publicRoutes from "./routes/public.js";
 import authRoutes from "./routes/auth.js";
 import adminRoutes from "./routes/admin.js";
+import { query as dbQuery } from "./db.js";
 
 const app = express();
 
@@ -21,6 +22,31 @@ app.use(express.json({ limit: "200kb" }));
 app.use(cookieParser());
 
 app.get("/api/health", (req, res) => res.json({ ok: true }));
+
+// Share-preview image: always the current profile photo, cropped to 1200x630
+app.get("/api/og-image", async (req, res, next) => {
+  try {
+    const { rows } = await dbQuery("SELECT avatar_url FROM profile WHERE id = 1");
+    const src = rows[0]?.avatar_url;
+    if (!src) return res.status(404).end();
+    if (!src.startsWith("https://res.cloudinary.com/")) return res.redirect(src);
+
+    const crop = "c_fill,g_face,w_1200,h_630,f_jpg,q_auto";
+    const url = src.replace(/\/upload\/(?:(?!v\d+\/)[^/]+\/)*/, `/upload/${crop}/`);
+
+    const img = await fetch(url);
+    if (!img.ok) return res.status(502).end();
+
+    res.set({
+      "Content-Type": "image/jpeg",
+      "Cache-Control": "public, max-age=300, s-maxage=3600",
+      "Cross-Origin-Resource-Policy": "cross-origin",
+    });
+    res.send(Buffer.from(await img.arrayBuffer()));
+  } catch (err) {
+    next(err);
+  }
+});
 
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
